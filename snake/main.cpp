@@ -44,15 +44,19 @@ public:
         case MOVE_UP:
             k_bones[0].y -= 1;
             break;
+
         case MOVE_DOWN:
             k_bones[0].y += 1;
             break;
+
         case MOVE_RIGHT:
             k_bones[0].x += 1;
             break;
+
         case MOVE_LEFT:
             k_bones[0].x -= 1;
             break;
+
         default:
             break;
         }
@@ -75,12 +79,6 @@ public:
             }
         }
 
-        if (k_bones[0].x == _secondSnake->k_bones[0].x && k_bones[0].y == _secondSnake->k_bones[0].y)
-        {
-            strcpy(Winner, "Collision");
-            return false;
-        }
-
         if (k_bones[0].x == 0 || k_bones[0].x == width - 1 || k_bones[0].y == 0 || k_bones[0].y == height - 1)
         {
             strcpy(Winner, k_second ? "Player1" : "Player2");
@@ -92,7 +90,8 @@ public:
             std::thread([]() {
                 Beep(1000, 200);
                 Beep(1200, 200);
-                }).detach();
+            }).detach();
+
             SpawnFruit();
         }
 
@@ -110,11 +109,11 @@ private:
 void Render(Snake*& _snake1, Snake*& _snake2)
 {
     HANDLE m_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD m_pos = { (SHORT)0, (SHORT)0 };
+    COORD m_pos = { 0, 0 };
     SetConsoleCursorPosition(m_handle, m_pos);
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             if (x == 0 || x == width - 1 || y == 0 || y == height - 1) 
             {
                 printf("#"); //Border
@@ -217,7 +216,7 @@ void UpdateInput(Snake*& _snake1, Snake*& _snake2)
 
 int main(int argc, char* argv[]) 
 {
-    srand (time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
     printf("\033[2J\033[1;1H");
 
     SetWindowTextW(GetConsoleWindow(), L"Snake");
@@ -230,12 +229,14 @@ int main(int argc, char* argv[])
         while (true) 
         {
             UpdateInput(m_snake1, m_snake2);
+
             if (!m_snake1->Update(m_snake2) || !m_snake2->Update(m_snake1))
             {
                 break;
             }
 
             std::thread(Beep, 400, 100).detach();
+
             Render(m_snake1, m_snake2);
             std::this_thread::sleep_for(std::chrono::milliseconds(150));
         }
@@ -254,10 +255,9 @@ int main(int argc, char* argv[])
         delete m_snake2;
         m_snake1 = nullptr;
         m_snake2 = nullptr;
-
     }
     catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
+        printf("Exception thrown: %s", ex.what());
         return EXIT_FAILURE;
     }
 
