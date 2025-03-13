@@ -41,9 +41,7 @@ public:
 
 private:
 	bool k_moving = false;
-
 	int k_angle = 0;
-	double k_speed = 0.0;
 
 	void Move();
 };

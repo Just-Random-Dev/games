@@ -127,24 +127,24 @@ void Paddle::Update()
 {
 	if (k_LastAction == PADDLE_DEFAULT)
 	{
-		k_Pixels.clear();
+		this->k_Pixels.clear();
 
 		for (int i = 0; i < PaddleLenght; i++)
 		{
-			if (k_PaddleId == 0)
+			if (this->k_PaddleId == 0)
 			{
-				k_Pixels.push_back({ 4, ((p_Height / 2) - PaddleLenght / 2) + i });
+				this->k_Pixels.push_back({ 4, ((p_Height / 2) - PaddleLenght / 2) + i });
 			}
 			else
 			{
-				k_Pixels.push_back({ p_Width - 5, ((p_Height / 2) - PaddleLenght / 2) + i });
+				this->k_Pixels.push_back({ p_Width - 5, ((p_Height / 2) - PaddleLenght / 2) + i });
 			}
 		}
 	}
 
 	if (_kbhit())
 	{
-		if (k_PaddleId == 0)
+		if (this->k_PaddleId == 0)
 		{
 			if (GetKeyState('W') & 0x8000)
 			{
@@ -199,13 +199,13 @@ bool Ball::Update()
 		int m_diff = std::abs(k_angle - m_directions[0]);
 		int m_closestAngle = m_directions[0];
 
-		for (int direction : m_directions)
+		for (int i = 0; i < sizeof(m_directions); i++)
 		{
-			int m_tempDiff = std::abs(k_angle - direction);
+			int m_tempDiff = std::abs(k_angle - m_directions[i]);
 			if (m_tempDiff < m_diff)
 			{
 				m_diff = m_tempDiff;
-				m_closestAngle = direction;
+				m_closestAngle = m_directions[i];
 			}
 		}
 
@@ -307,7 +307,7 @@ void Ball::Move()
 	switch (k_angle)
 	{
 	case 45:
-		this->k_pos.x += 1 ;
+		this->k_pos.x += 1;
 		this->k_pos.y -= 1;
 		break;
 
