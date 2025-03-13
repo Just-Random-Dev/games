@@ -68,6 +68,8 @@ int main(int argc, char* argv[])
 	CONSOLE_CURSOR_INFO m_cursorInfo;
 
 	try {
+		std::ios_base::sync_with_stdio(false);
+
 		p_Ball = std::make_unique<Ball>();
 		p_FirstPaddle = new Paddle(0);
 		p_SecondPaddle = new Paddle(1);
@@ -217,11 +219,13 @@ bool Ball::Update()
 	{
 		if (this->k_pos.x == 1)
 		{
+			Beep(1000, 200);
 			p_SecondPaddle->k_Score += 1;
 			return false;
 		}
 		else if (this->k_pos.x == p_Width - 2)
 		{
+			Beep(1000, 200);
 			p_FirstPaddle->k_Score += 1;
 			return false;
 		}
@@ -230,7 +234,7 @@ bool Ball::Update()
 		{
 			if (k_angle == 225)
 			{
-				k_angle -= 90;
+				k_angle = 135;
 			}
 			else if (k_angle == 45)
 			{
