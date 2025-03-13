@@ -79,12 +79,7 @@ public:
             }
         }
 
-        if (k_bones[0].x == 0 || k_bones[0].x == width - 1 || k_bones[0].y == 0 || k_bones[0].y == height - 1)
-        {
-            strcpy(Winner, k_second ? "Player1" : "Player2");
-            return false;
-        }
-        else if (k_bones[0].x == FruitPos.x && k_bones[0].y == FruitPos.y)
+        if (k_bones[0].x == FruitPos.x && k_bones[0].y == FruitPos.y)
         {
             k_bones.push_back(k_bones.back());
             std::thread([]() {
@@ -221,9 +216,17 @@ int main(int argc, char* argv[])
 
     SetWindowTextW(GetConsoleWindow(), L"Snake");
 
+    CONSOLE_CURSOR_INFO m_cursorInfo;
+
     try {
         Snake* m_snake1 = new Snake(false);
         Snake* m_snake2 = new Snake(true);
+
+        GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &m_cursorInfo);
+        m_cursorInfo.bVisible = FALSE;
+
+        SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &m_cursorInfo);
+
         SpawnFruit();
 
         while (true) 
