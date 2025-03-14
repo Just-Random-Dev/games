@@ -9,15 +9,15 @@
 
 const int PaddleLenght = 6;
 
-const std::vector<int> m_directions = { 45, 135, 225, 315 };
+const std::vector<int> p_directions = { 45, 135, 225, 315 };
 
-const uint64_t p_Width = 119;
-const uint64_t p_Height = 29;
+const double p_Width = 119;
+const double p_Height = 29;
 
 typedef struct
 {
-	uint64_t x;
-	uint64_t y;
+	double x;
+	double y;
 } pos_t;
 
 enum eLastPaddleAction
@@ -41,6 +41,7 @@ public:
 
 private:
 	bool k_moving = false;
+	double k_speed = 0.0;
 	int k_angle = 0;
 
 	void Move();
@@ -68,6 +69,7 @@ public:
 	~Paddle() {}
 
 	void Update();
+	void Reset();
 
 	int k_Score = 0;
 	eLastPaddleAction k_LastAction = PADDLE_DEFAULT;

@@ -19,29 +19,34 @@ void Render()
 			else {
 				bool m_empty = true;
 
-				for (int i = 0; i < p_FirstPaddle->k_Pixels.size(); i++)
+				if (x == 4)
 				{
-					if (x == p_FirstPaddle->k_Pixels[i].x && y == p_FirstPaddle->k_Pixels[i].y)
+					for (int i = 0; i < p_FirstPaddle->k_Pixels.size(); i++)
 					{
-						printf("|");
-						m_empty = false;
-						break;
+						if (x == (int)p_FirstPaddle->k_Pixels[i].x && y == (int)p_FirstPaddle->k_Pixels[i].y)
+						{
+							printf("|");
+							m_empty = false;
+							break;
+						}
 					}
 				}
-
-				for (int i = 0; i < p_SecondPaddle->k_Pixels.size(); i++)
+				else if (x == p_Width - 5)
 				{
-					if (x == p_SecondPaddle->k_Pixels[i].x && y == p_SecondPaddle->k_Pixels[i].y)
+					for (int i = 0; i < p_SecondPaddle->k_Pixels.size(); i++)
 					{
-						printf("|");
-						m_empty = false;
-						break;
+						if (x == (int)p_SecondPaddle->k_Pixels[i].x && y == (int)p_SecondPaddle->k_Pixels[i].y)
+						{
+							printf("|");
+							m_empty = false;
+							break;
+						}
 					}
 				}
 
 				if (m_empty)
 				{
-					if (x == p_Ball->k_pos.x && y == p_Ball->k_pos.y)
+					if (x == (int)p_Ball->k_pos.x && y == (int)p_Ball->k_pos.y)
 					{
 						printf("O");
 						m_empty = false;
@@ -87,8 +92,8 @@ int main(int argc, char* argv[])
 			if (!p_Ball->Update())
 			{
 				p_Ball = std::make_unique<Ball>();
-				p_FirstPaddle->k_LastAction = PADDLE_DEFAULT;
-				p_SecondPaddle->k_LastAction = PADDLE_DEFAULT;
+				p_FirstPaddle->Reset();
+				p_SecondPaddle->Reset();
 
 				if (p_FirstPaddle->k_Score == 10 || p_SecondPaddle->k_Score == 10)
 				{
@@ -100,8 +105,11 @@ int main(int argc, char* argv[])
 					}).detach();
 
 					char m_winner[50];
-					if (p_FirstPaddle->k_Score == 10) strcpy(m_winner, "Player1 won!");
-					if (p_SecondPaddle->k_Score == 10) strcpy(m_winner, "Player2 won!");
+					if (p_FirstPaddle->k_Score == 10) 
+						strcpy(m_winner, "Player1 has won!");
+
+					if (p_SecondPaddle->k_Score == 10) 
+						strcpy(m_winner, "Player2 has won!");
 					
 					MessageBoxA(nullptr, m_winner, "Game Over", MB_OK | MB_ICONINFORMATION);
 					break;
@@ -127,52 +135,32 @@ int main(int argc, char* argv[])
 
 void Paddle::Update()
 {
-	if (k_LastAction == PADDLE_DEFAULT)
+	if (this->k_PaddleId == 0)
 	{
-		this->k_Pixels.clear();
-
-		for (int i = 0; i < PaddleLenght; i++)
+		if (GetKeyState('W') & 0x8000)
 		{
-			if (this->k_PaddleId == 0)
-			{
-				this->k_Pixels.push_back({ 4, ((p_Height / 2) - PaddleLenght / 2) + i });
-			}
-			else
-			{
-				this->k_Pixels.push_back({ p_Width - 5, ((p_Height / 2) - PaddleLenght / 2) + i });
-			}
+			this->k_LastAction = PADDLE_UP;
+		}
+
+		if (GetKeyState('S') & 0x8000)
+		{
+			this->k_LastAction = PADDLE_DOWN;
+		}
+	}
+	else if (this->k_PaddleId == 1)
+	{
+		if (GetKeyState(VK_UP) & 0x8000)
+		{
+			this->k_LastAction = PADDLE_UP;
+		}
+
+		if (GetKeyState(VK_DOWN) & 0x8000)
+		{
+			this->k_LastAction = PADDLE_DOWN;
 		}
 	}
 
-	if (_kbhit())
-	{
-		if (this->k_PaddleId == 0)
-		{
-			if (GetKeyState('W') & 0x8000)
-			{
-				this->k_LastAction = PADDLE_UP;
-			}
-			
-			if (GetKeyState('S') & 0x8000)
-			{
-				this->k_LastAction = PADDLE_DOWN;
-			}
-		}
-		else if (k_PaddleId == 1)
-		{
-			if (GetKeyState(VK_UP) & 0x8000)
-			{
-				this->k_LastAction = PADDLE_UP;
-			}
-
-			if (GetKeyState(VK_DOWN) & 0x8000)
-			{
-				this->k_LastAction = PADDLE_DOWN;
-			}
-		}
-	}
-
-	if (this->k_LastAction == PADDLE_UP && this->k_Pixels[0].y != 1)
+	if (this->k_LastAction == PADDLE_UP && (int)this->k_Pixels[0].y != 1)
 	{
 		for (int i = 0; i < PaddleLenght; i++)
 		{
@@ -180,7 +168,7 @@ void Paddle::Update()
 		}
 	}
 
-	if (this->k_LastAction == PADDLE_DOWN && this->k_Pixels[PaddleLenght - 1].y != p_Height - 2)
+	if (this->k_LastAction == PADDLE_DOWN && (int)this->k_Pixels[PaddleLenght - 1].y != p_Height - 2)
 	{
 		for (int i = 0; i < PaddleLenght; i++)
 		{
@@ -189,52 +177,56 @@ void Paddle::Update()
 	}
 }
 
+void Paddle::Reset()
+{
+	this->k_LastAction = PADDLE_DEFAULT;
+	this->k_Pixels.clear();
+
+	for (int i = 0; i < PaddleLenght; i++)
+	{
+		if (this->k_PaddleId == 0)
+		{
+			this->k_Pixels.push_back({ 4, ((p_Height / 2) - PaddleLenght / 2) + i });
+		}
+		else
+		{
+			this->k_Pixels.push_back({ p_Width - 5, ((p_Height / 2) - PaddleLenght / 2) + i });
+		}
+	}
+}
+
 bool Ball::Update()
 {
 	if (((p_FirstPaddle->k_LastAction != PADDLE_DEFAULT) || (p_SecondPaddle->k_LastAction != PADDLE_DEFAULT)) && !k_moving)
 	{
-		bool m_startDirection = rand() % 2;
-		this->k_angle = rand() % 120 + 30;
-
-		if (m_startDirection) this->k_angle += 180;
-
-		int m_diff = std::abs(k_angle - m_directions[0]);
-		int m_closestAngle = m_directions[0];
-
-		for (int i = 0; i < sizeof(m_directions); i++)
-		{
-			int m_tempDiff = std::abs(k_angle - m_directions[i]);
-			if (m_tempDiff < m_diff)
-			{
-				m_diff = m_tempDiff;
-				m_closestAngle = m_directions[i];
-			}
-		}
-
-		k_angle = m_closestAngle;
+		this->k_angle = p_directions[rand() % 4];
 		k_moving = true;
 	}
 
 	if (k_moving)
 	{
-		if (this->k_pos.x == 1)
+		if ((int)this->k_pos.x == 1 || (int)this->k_pos.x == 0)
 		{
-			Beep(1000, 200);
 			p_SecondPaddle->k_Score += 1;
+			Beep(1000, 200);
 			return false;
 		}
-		else if (this->k_pos.x == p_Width - 2)
+		else if ((int)this->k_pos.x == p_Width - 2 || (int)this->k_pos.x == p_Width - 1)
 		{
-			Beep(1000, 200);
 			p_FirstPaddle->k_Score += 1;
+			Beep(1000, 200);
 			return false;
 		}
 
-		if (this->k_pos.y == 1 || this->k_pos.y == p_Height - 2)
+		if ((int)this->k_pos.y == 1 || (int)this->k_pos.y == 0 || (int)this->k_pos.y == p_Height - 1 || (int)this->k_pos.y == p_Height - 2)
 		{
 			if (k_angle == 225)
 			{
 				k_angle = 135;
+			}
+			else if (k_angle == 135)
+			{
+				k_angle = 225;
 			}
 			else if (k_angle == 45)
 			{
@@ -244,17 +236,13 @@ bool Ball::Update()
 			{
 				k_angle = 45;
 			}
-			else
-			{
-				k_angle += 90;
-			}
 		}
 
-		if (this->k_pos.x == 5)
+		if ((int)this->k_pos.x == 5 || (int)this->k_pos.x == 4)
 		{
-			for (int i = 0; i < p_FirstPaddle->k_Pixels.size(); i++)
+			for (int i = 0; i < PaddleLenght; i++)
 			{
-				if (this->k_pos.y == p_FirstPaddle->k_Pixels[i].y)
+				if ((int)this->k_pos.y == (int)p_FirstPaddle->k_Pixels[i].y)
 				{
 					std::thread([]() {
 						Beep(1000, 200);
@@ -269,16 +257,17 @@ bool Ball::Update()
 					{
 						k_angle = 45;
 					}
+					if (this->k_speed <= 0.31) this->k_speed += 0.1;
 					break;
 				}
 			}
 		}
 
-		if (this->k_pos.x == p_Width - 6)
+		if ((int)this->k_pos.x == p_Width - 6 || (int)this->k_pos.x == p_Width - 5)
 		{
-			for (int i = 0; i < p_SecondPaddle->k_Pixels.size(); i++)
+			for (int i = 0; i < PaddleLenght; i++)
 			{
-				if (this->k_pos.y == p_SecondPaddle->k_Pixels[i].y)
+				if ((int)this->k_pos.y == (int)p_SecondPaddle->k_Pixels[i].y)
 				{
 					std::thread([]() {
 						Beep(1000, 200);
@@ -293,6 +282,7 @@ bool Ball::Update()
 					{
 						k_angle = 135;
 					}
+					if (this->k_speed <= 0.31) this->k_speed += 0.1;
 					break;
 				}
 			}
@@ -306,28 +296,26 @@ bool Ball::Update()
 
 void Ball::Move()
 {
-	if (k_angle > 360) k_angle - 360;
-
 	switch (k_angle)
 	{
 	case 45:
-		this->k_pos.x += 1;
-		this->k_pos.y -= 1;
+		this->k_pos.x += 1.0 + k_speed;
+		this->k_pos.y -= 1.0 + k_speed;
 		break;
 
 	case 135:
-		this->k_pos.x -= 1;
-		this->k_pos.y -= 1;
+		this->k_pos.x -= 1.0 + k_speed;
+		this->k_pos.y -= 1.0 + k_speed;
 		break;
 
 	case 225:
-		this->k_pos.x -= 1;
-		this->k_pos.y += 1;
+		this->k_pos.x -= 1.0 + k_speed;
+		this->k_pos.y += 1.0 + k_speed;
 		break;
 
 	case 315:
-		this->k_pos.x += 1;
-		this->k_pos.y += 1;
+		this->k_pos.x += 1.0 + k_speed;
+		this->k_pos.y += 1.0 + k_speed;
 		break;
 
 	default:
