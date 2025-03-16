@@ -23,3 +23,5 @@ pong/build/Pong.Build.CppClean.log
 snake/.vs/Snake/v16/.suo
 snake/.vs/Snake/v16/Browse.VC.db
 snake/.vs/Snake/v16/ipch/AutoPCH/3c808ba1872214ea/MAIN.ipch
+pong/build/vc142.idb
+pong/build/Pong.ilk

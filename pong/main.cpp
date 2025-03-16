@@ -62,7 +62,7 @@ void Render()
         printf("\n");
     }
 
-	printf("Player1`s Score: %d										Player2`s Score: %d", p_FirstPaddle->k_Score, p_SecondPaddle->k_Score);
+	printf("Player1`s Score: %d\t\t\t\t\t\t\t\t\t\t   Player2`s Score: %d", p_FirstPaddle->k_Score, p_SecondPaddle->k_Score);
 }
 
 int main(int argc, char* argv[])
@@ -104,14 +104,21 @@ int main(int argc, char* argv[])
 						Beep(200, 500);
 					}).detach();
 
-					char m_winner[50];
+					char m_winner[10]; char m_text[50];
 					if (p_FirstPaddle->k_Score == 10) 
-						strcpy(m_winner, "Player1 has won!");
+						strcpy(m_winner, "Player1");
 
 					if (p_SecondPaddle->k_Score == 10) 
-						strcpy(m_winner, "Player2 has won!");
-					
-					MessageBoxA(nullptr, m_winner, "Game Over", MB_OK | MB_ICONINFORMATION);
+						strcpy(m_winner, "Player2");
+
+					snprintf(m_text, sizeof(m_text), "Game over. %s wins. Press Enter to continue.", m_winner);
+
+					HANDLE m_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+					SetConsoleCursorPosition(m_handle, { 34, (SHORT)p_Height });
+
+					printf(m_text);
+
+					while (!(GetKeyState(VK_RETURN) & 0x8000)) {}
 					break;
 				}
 			}
