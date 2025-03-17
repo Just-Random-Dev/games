@@ -7,62 +7,40 @@ std::unique_ptr<Ball> p_Ball = nullptr;
 
 void Render()
 {
-	HANDLE m_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(m_handle, { 0, 0 });
+    HANDLE m_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(m_handle, { 0, 0 });
 
-    for (int y = 0; y < p_Height; y++) {
-        for (int x = 0; x < p_Width; x++) {
-            if (x == 0 || x == p_Width - 1 || y == 0 || y == p_Height - 1)
-            {
-                printf("#"); //Border
-            }
-			else {
-				bool m_empty = true;
+    std::vector<std::string> m_buffer(p_Height, std::string(p_Width, ' '));
 
-				if (x == 4)
-				{
-					for (int i = 0; i < p_FirstPaddle->k_Pixels.size(); i++)
-					{
-						if (x == (int)p_FirstPaddle->k_Pixels[i].x && y == (int)p_FirstPaddle->k_Pixels[i].y)
-						{
-							printf("|");
-							m_empty = false;
-							break;
-						}
-					}
-				}
-				else if (x == p_Width - 5)
-				{
-					for (int i = 0; i < p_SecondPaddle->k_Pixels.size(); i++)
-					{
-						if (x == (int)p_SecondPaddle->k_Pixels[i].x && y == (int)p_SecondPaddle->k_Pixels[i].y)
-						{
-							printf("|");
-							m_empty = false;
-							break;
-						}
-					}
-				}
-
-				if (m_empty)
-				{
-					if (x == (int)p_Ball->k_pos.x && y == (int)p_Ball->k_pos.y)
-					{
-						printf("O");
-						m_empty = false;
-					}
-				}
-
-				if (m_empty)
-				{
-					printf(" ");
-				}
-			}
-        }
-        printf("\n");
+    for (int x = 0; x < p_Width; x++) 
+	{
+		m_buffer[0][x] = '#';
+		m_buffer[p_Height - 1][x] = '#';
+    }
+    for (int y = 0; y < p_Height; y++) 
+	{
+		m_buffer[y][0] = '#';
+		m_buffer[y][p_Width - 1] = '#';
     }
 
-	printf("Player1`s Score: %d\t\t\t\t\t\t\t\t\t\t   Player2`s Score: %d", p_FirstPaddle->k_Score, p_SecondPaddle->k_Score);
+    for (int i = 0; i < p_FirstPaddle->k_Pixels.size(); i++)
+	{
+		m_buffer[(int)p_FirstPaddle->k_Pixels[i].y][(int)p_FirstPaddle->k_Pixels[i].x] = '|';
+    }
+
+	for (int i = 0; i < p_SecondPaddle->k_Pixels.size(); i++)
+	{
+		m_buffer[(int)p_SecondPaddle->k_Pixels[i].y][(int)p_SecondPaddle->k_Pixels[i].x] = '|';
+	}
+
+	m_buffer[(int)p_Ball->k_pos.y][(int)p_Ball->k_pos.x] = 'O';
+
+	for (int i = 0; i < m_buffer.size(); i++)
+	{
+		printf("%s\n", m_buffer[i].c_str());
+	}
+
+    printf("Player1`s Score: %d\t\t\t\t\t\t\t\t\t\t   Player2`s Score: %d", p_FirstPaddle->k_Score, p_SecondPaddle->k_Score);
 }
 
 int main(int argc, char* argv[])
@@ -97,7 +75,8 @@ int main(int argc, char* argv[])
 
 				if (p_FirstPaddle->k_Score == 10 || p_SecondPaddle->k_Score == 10)
 				{
-					std::thread([]() {
+					std::thread([]() 
+					{
 						Beep(800, 300);
 						Beep(600, 300);
 						Beep(400, 300);
@@ -122,6 +101,8 @@ int main(int argc, char* argv[])
 					break;
 				}
 			}
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
 			Render();
 		}
@@ -251,7 +232,8 @@ bool Ball::Update()
 			{
 				if ((int)this->k_pos.y == (int)p_FirstPaddle->k_Pixels[i].y)
 				{
-					std::thread([]() {
+					std::thread([]() 
+					{
 						Beep(1000, 200);
 						Beep(1200, 200);
 					}).detach();
@@ -264,7 +246,6 @@ bool Ball::Update()
 					{
 						k_angle = 45;
 					}
-					if (this->k_speed <= 0.31) this->k_speed += 0.1;
 					break;
 				}
 			}
@@ -289,7 +270,6 @@ bool Ball::Update()
 					{
 						k_angle = 135;
 					}
-					if (this->k_speed <= 0.31) this->k_speed += 0.1;
 					break;
 				}
 			}
@@ -306,23 +286,23 @@ void Ball::Move()
 	switch (k_angle)
 	{
 	case 45:
-		this->k_pos.x += 1.0 + k_speed;
-		this->k_pos.y -= 1.0 + k_speed;
+		this->k_pos.x += 1.0;
+		this->k_pos.y -= 1.0;
 		break;
 
 	case 135:
-		this->k_pos.x -= 1.0 + k_speed;
-		this->k_pos.y -= 1.0 + k_speed;
+		this->k_pos.x -= 1.0;
+		this->k_pos.y -= 1.0;
 		break;
 
 	case 225:
-		this->k_pos.x -= 1.0 + k_speed;
-		this->k_pos.y += 1.0 + k_speed;
+		this->k_pos.x -= 1.0;
+		this->k_pos.y += 1.0;
 		break;
 
 	case 315:
-		this->k_pos.x += 1.0 + k_speed;
-		this->k_pos.y += 1.0 + k_speed;
+		this->k_pos.x += 1.0;
+		this->k_pos.y += 1.0;
 		break;
 
 	default:

@@ -5,6 +5,7 @@
 #include <memory>
 #include <thread>
 #include <cmath>
+#include <chrono>
 #include <cstdlib>
 
 const int PaddleLenght = 6;
@@ -41,7 +42,6 @@ public:
 
 private:
 	bool k_moving = false;
-	double k_speed = 0.0;
 	int k_angle = 0;
 
 	void Move();
